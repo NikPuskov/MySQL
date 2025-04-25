@@ -54,7 +54,7 @@
 
 - Меняем пароль:
 
-[root@master ~]# `mysql -uroot -p'%l-.!:uEa5la'`
+[root@master ~]# `mysql -uroot -p'kPGOCM2>SKV<'`
 
 mysql> `ALTER USER USER() IDENTIFIED BY 'AsdQaz123$';`
 
