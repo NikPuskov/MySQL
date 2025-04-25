@@ -16,7 +16,17 @@
 
 - Устанавливаем на обе машины Percona Server for MySQL 5.7
 
-image1
+`sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo`
+
+`sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo`
+
+`sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo`
+
+`yum install https://repo.percona.com/yum/percona-release-latest.noarch.rpm`
+
+`percona-release setup ps57`
+
+`yum install Percona-Server-server-57`
 
 - Те же действия повторяем на slave.
 
