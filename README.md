@@ -50,35 +50,45 @@
 
 - При установке Percona автоматически генерирует пароль для пользователя root и кладет его в файл /var/log/mysqld.log:
 
-image3
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql2.jpg)
 
 - Меняем пароль:
 
-image4
+[root@master ~]# `mysql -uroot -p'h&Hp,1oAav(7'`
+
+mysql> `ALTER USER USER() IDENTIFIED BY 'AsdQaz123$';`
+
+Query OK, 0 rows affected (0.00 sec)
 
 - Репликацию будем настраивать с использованием GTID. GTID представляет собой уникальный 128-битный глобальный идентификационный номер (SERVER_UUID), который увеличивается с каждой новой транзакцией.
 
 - Следует обратить внимание, что атрибут server-id на мастер-сервере должен обязательно отличаться от server-id слейв-сервера. Проверить какая переменная установлена на текущий момент можно следующим образом:
 
-image5
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql3.jpg)
 
 - Параметр server-id у нас прописан в конфигурационном файле etc/my.cnf.d/01-base.cnf. Соответственно на slave его нужно изменить и перезагрузить mysql.
 
 - Убеждаемся что GTID включён:
 
-image6
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql4.jpg)
 
 - Создадим тестовую базу bet на master'е, загрузим в нее дамп и проверим:
 
-image7
+mysql> `CREATE DATABASE bet;`
+
+Query OK, 1 row affected (0.00 sec)
+
+`mysql -uroot -p -D bet < /vagrant/bet.dmp`
+
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql5.jpg)
 
 - Создадим пользователя для репликации и дадим ему права на эту самую репликацию:
 
-image8
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql6.jpg)
 
 - Дампим базу для последующего залива на slave и игнорируем таблицы по заданию:
 
-image9
+`mysqldump --all-databases --triggers --routines --master-data --ignore-table=bet.events_on_demand --ignore-table=bet.v_same_event -uroot -p > master.sql`
 
 - На слейве раскомментируем в /etc/my.cnf.d/05-binlog.cnf строки:
 
