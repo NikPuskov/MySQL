@@ -44,7 +44,7 @@
 
 - Запускаем службу MySQL:
 
-image2
+![Image alt](https://github.com/NikPuskov/MySQL/blob/main/mysql1.jpg)
 
 - Те же действия выполняем на slave.
 
