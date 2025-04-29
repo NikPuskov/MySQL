@@ -20,25 +20,22 @@ Vagrant.configure("2") do |config|
           box.vm.box = boxconfig[:box_name]
           box.vm.host_name = boxname.to_s
 
-          #box.vm.network "forwarded_port", guest: 3260, host: 3260+offset
-
           box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
           box.vm.provider :virtualbox do |vb|
-            vb.customize ["modifyvm", :id, "--memory", "1024"]
-            # Подключаем дополнительные диски
-            #vb.customize ['createhd', '--filename', second_disk, '--format', 'VDI', '--size', 5 * 1024]
-            #vb.customize ['storageattach', :id, '--storagectl', 'IDE', '--port', 0, '--device', 1, '--type', 'hdd', '--medium', second_disk]
+            vb.customize ["modifyvm", :id, "--memory", "1024"]  
           end
-
-          # box.vm.provision :shell do |s|
-          #    s.inline = 'mkdir -p ~root/.ssh; cp ~vagrant/.ssh/auth* ~root/.ssh'
-          # end
+          
+          config.vm.provision "shell", inline: <<-SHELL
+                    sudo sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+                    sudo sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+                    sudo sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+          SHELL
+          
           if index == MACHINES.size - 1
             box.vm.provision "playbook1", type:'ansible' do |ansible|
               ansible.playbook = "ansible/provision.yml"
-              ansible.inventory_path = "ansible/inventory.yml"
-              # ansible.galaxy_roles_path = "./roles"
+              ansible.inventory_path = "ansible/inventory.yml"              
               ansible.host_key_checking = "false"
               ansible.limit = "all"
               ansible.galaxy_command = 'ansible-galaxy collection install community.mysql'
