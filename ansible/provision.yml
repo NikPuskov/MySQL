@@ -63,19 +63,6 @@
       - "touch /root/.mysql_pass_changed"
     when: not mysql_history.stat.exists
 
-  # - name: Change mysql root user password
-  #   community.mysql.mysql_query:
-  #     login_user: root
-  #     login_password: "{{ mysql_pass.stdout }}"
-  #     query: "ALTER USER USER() IDENTIFIED BY '{{ mysql_root_pass }}'"
-  #     login_unix_socket: /var/lib/mysql/mysql.sock
-  #   register: alter_result
-  #   when: not mysql_history.stat.exists
-
-  # - name: Set changed password flag
-  #   ansible.builtin.shell: "touch /root/.mysql_pass_changed"
-  #   when: alter_result.changed
-
   - name: Find user repl
     community.mysql.mysql_query:
       login_user: root
@@ -168,10 +155,6 @@
         query: CREATE DATABASE bet
         login_unix_socket: /var/lib/mysql/mysql.sock
 
-    # - name: Restore database from backup
-    #   ansible.builtin.shell:
-    #     cmd: "mysql -uroot -p'{{ mysql_root_pass }}' -D bet < /home/vagrant/bet.dmp"
-
     - name: Restore database from backup
       community.mysql.mysql_db:
         state: import
@@ -196,13 +179,6 @@
   - name: Print SHOW TABLES from restored database
     ansible.builtin.debug:
       msg: "{{ show_tables.query_result[0] }}"
-
-  # - name: Dump database for slave
-  #   ansible.builtin.command:
-  #     cmd: >
-  #       "/bin/mysqldump --all-databases --triggers --routines --master-data
-  #       --ignore-table=bet.events_on_demand --ignore-table=bet.v_same_event
-  #       -uroot -p'{{ mysql_root_pass }}' --set-gtid-purged=OFF --result-file=/home/vagrant/master.sql"
 
   - name: Dump database for slave
     community.mysql.mysql_db:
@@ -262,14 +238,6 @@
         login_password: "{{ mysql_root_pass }}"
         query: CREATE DATABASE bet
         login_unix_socket: /var/lib/mysql/mysql.sock
-
-    # - name: Restore database on slave
-    #   community.mysql.mysql_query:
-    #     login_user: root
-    #     login_password: "{{ mysql_root_pass }}"
-    #     login_db: bet
-    #     query: SOURCE /home/vagrant/master.sql
-    #     login_unix_socket: /var/lib/mysql/mysql.sock
 
     - name: Restore database on slave
       community.mysql.mysql_db:
